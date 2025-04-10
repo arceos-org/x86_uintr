@@ -1,0 +1,18 @@
+# Build output and other log files
+/target
+*.asm
+*.img
+*.bin
+*.elf
+actual.out
+qemu.log
+rusty-tags.vi
+
+# Visual Studio Code settings
+/.vscode
+
+# macOS system files
+.DS_Store
+
+# We ignore Cargo.lock because `x86_uintr` is just a library
+Cargo.lock
