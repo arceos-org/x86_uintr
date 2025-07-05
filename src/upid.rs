@@ -1,6 +1,6 @@
 //! UPID: User Posted-Interrupt Descriptor
 
-use tock_registers::{LocalRegisterCopy, register_bitfields, register_structs};
+use tock_registers::{LocalRegisterCopy, register_bitfields};
 
 register_bitfields![u64,
     NotificationControl [
@@ -21,14 +21,13 @@ register_bitfields![u64,
 
 pub type NotificationControlLocal = LocalRegisterCopy<u64, NotificationControl::Register>;
 
-register_structs! {
-    pub Upid {
-        (0x00 => control: NotificationControlLocal),
-        /// One bit for each user-interrupt vector.
-        /// There is a user-interrupt request for a vector if the corresponding bit is 1.
-        (0x08 => posted_uirq: LocalRegisterCopy<u64>),
-        (0x10 => @END),
-    }
+#[repr(C, align(64))]
+#[derive(Debug, Clone, Copy)]
+pub struct Upid {
+    control: NotificationControlLocal,
+    /// One bit for each user-interrupt vector.
+    /// There is a user-interrupt request for a vector if the corresponding bit is 1.
+    posted_uirq: LocalRegisterCopy<u64>,
 }
 
 impl Upid {
