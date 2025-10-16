@@ -1,5 +1,7 @@
 //! UPID: User Posted-Interrupt Descriptor
 
+use core::fmt::{Debug, Formatter, Result};
+
 use tock_registers::{LocalRegisterCopy, register_bitfields};
 
 register_bitfields![u64,
@@ -22,9 +24,9 @@ register_bitfields![u64,
 pub type NotificationControlLocal = LocalRegisterCopy<u64, NotificationControl::Register>;
 
 #[repr(C, align(64))]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct Upid {
-    control: NotificationControlLocal,
+    pub control: NotificationControlLocal,
     /// One bit for each user-interrupt vector.
     /// There is a user-interrupt request for a vector if the corresponding bit is 1.
     posted_uirq: LocalRegisterCopy<u64>,
@@ -41,5 +43,34 @@ impl Upid {
             ),
             posted_uirq: LocalRegisterCopy::new(0),
         }
+    }
+
+    pub fn set_notification_enabled(&mut self, enabled: bool) {
+        self.control
+            .modify(NotificationControl::SUPPRESSED.val(!enabled as _));
+    }
+}
+
+impl Debug for Upid {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        f.debug_struct("Upid")
+            .field(
+                "outstanding",
+                &(self.control.is_set(NotificationControl::OUTSTANDING)),
+            )
+            .field(
+                "suppressed",
+                &(self.control.is_set(NotificationControl::SUPPRESSED)),
+            )
+            .field(
+                "vector",
+                &(format_args!("{:#x}", self.control.read(NotificationControl::VECTOR))),
+            )
+            .field(
+                "destination",
+                &(self.control.read(NotificationControl::DESTINATION)),
+            )
+            .field("UPIR", &format_args!("{:#x}", self.posted_uirq.get()))
+            .finish()
     }
 }

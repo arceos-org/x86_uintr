@@ -1,3 +1,4 @@
+use core::fmt::Debug;
 use tock_registers::{LocalRegisterCopy, fields::FieldValue, register_bitfields};
 use x86::msr::{rdmsr, wrmsr};
 

@@ -3,6 +3,8 @@ use crate::{
     msr::*,
     uitte::UittEntry,
 };
+use core::fmt::{Debug, Formatter, Result};
+
 use core::slice;
 use tock_registers::{LocalRegisterCopy, register_structs};
 
@@ -10,7 +12,7 @@ register_structs! {
     /// State component 14 is supervisor state used for User Interrupts state.
     /// The size of this state is 48 bytes.
     #[repr(C)]
-    #[derive(Debug, Copy, Clone)]
+    #[derive(Copy, Clone)]
     pub UintrState {
         /// UIHANDLER: user-interrupt handler.
         /// This is the linear address of the user-interrupt handler.
@@ -204,5 +206,43 @@ impl UintrState {
     pub unsafe fn uitt_mut(&mut self) -> &mut [UittEntry] {
         let uitt_sz = self.misc.read(Misc::UITTSZ);
         unsafe { slice::from_raw_parts_mut(self.target_table.get() as *mut _, uitt_sz as usize) }
+    }
+}
+
+impl Debug for UintrState {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        f.debug_struct("UintrState")
+            .field("handler", &format_args!("{:#x}", self.handler.get()))
+            .field(
+                "stack_mode",
+                &(if self.stack_adjust.read(StackAdjust::MODE) == StackAdjust::MODE::Subtract.value
+                {
+                    "substract"
+                } else {
+                    "load"
+                }),
+            )
+            .field(
+                "stack_addr",
+                &format_args!("{:#x}", self.stack_adjust.get()),
+            )
+            .field("UITTSZ", &(self.misc.read(Misc::UITTSZ)))
+            .field("UINV", &(format_args!("{:#x}", self.misc.read(Misc::UINV))))
+            .field("UIF", &(self.misc.is_set(Misc::UIF)))
+            .field("UPID addr", &(format_args!("{:#x}", self.post_desc.get())))
+            .field("UIRR", &(format_args!("{:#x}", self.uirr.get())))
+            .field(
+                "send_enabled",
+                &(self.target_table.is_set(TargetTable::SEND_ENABLED)),
+            )
+            .field(
+                "UITT addr",
+                &format_args!(
+                    "{:#x}",
+                    self.target_table.get()
+                        & (TargetTable::UITTADDR.mask << TargetTable::UITTADDR.shift)
+                ),
+            )
+            .finish()
     }
 }
