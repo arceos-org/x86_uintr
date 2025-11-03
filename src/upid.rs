@@ -29,7 +29,7 @@ pub struct Upid {
     pub control: NotificationControlLocal,
     /// One bit for each user-interrupt vector.
     /// There is a user-interrupt request for a vector if the corresponding bit is 1.
-    posted_uirq: LocalRegisterCopy<u64>,
+    pub posted_uirq: LocalRegisterCopy<u64>,
 }
 
 impl Upid {
@@ -48,6 +48,11 @@ impl Upid {
     pub fn set_notification_enabled(&mut self, enabled: bool) {
         self.control
             .modify(NotificationControl::SUPPRESSED.val(!enabled as _));
+    }
+
+    pub fn set_outstanding_notification(&mut self, outstanding: bool) {
+        self.control
+            .modify(NotificationControl::OUTSTANDING.val(outstanding as _));
     }
 }
 
