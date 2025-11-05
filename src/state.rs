@@ -12,7 +12,6 @@ register_structs! {
     /// State component 14 is supervisor state used for User Interrupts state.
     /// The size of this state is 48 bytes.
     #[repr(C)]
-    #[derive(Copy, Clone)]
     pub UintrState {
         /// UIHANDLER: user-interrupt handler.
         /// This is the linear address of the user-interrupt handler.

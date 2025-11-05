@@ -24,7 +24,6 @@ register_bitfields![u64,
 pub type NotificationControlLocal = LocalRegisterCopy<u64, NotificationControl::Register>;
 
 #[repr(C, align(64))]
-#[derive(Clone, Copy)]
 pub struct Upid {
     pub control: NotificationControlLocal,
     /// One bit for each user-interrupt vector.

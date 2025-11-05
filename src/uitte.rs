@@ -16,7 +16,6 @@ pub type VuvLocal = LocalRegisterCopy<u64, VUV::Register>;
 
 register_structs! {
     #[repr(C, align(16))]
-    #[derive(Clone, Copy)]
     pub UittEntry {
         (0x00 => state: VuvLocal),
         (0x08 => upid_addr: PostDescLocal),
