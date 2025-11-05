@@ -48,13 +48,12 @@ impl UittEntry {
 
 impl Debug for UittEntry {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        f.debug_struct("UittEntry")
-            .field("valid", &(self.is_valid()))
-            .field(
-                "UINV",
-                &(format_args!("{:#x}", self.state.read(VUV::UINTR_VECTOR))),
-            )
-            .field("upid_addr", &(format_args!("{:#x}", self.upid_addr.get())))
-            .finish()
+        write!(
+            f,
+            "UittEntry {{ valid: {}, UINV: {:#x}, upid_addr: {:#x} }}",
+            self.is_valid(),
+            self.state.read(VUV::UINTR_VECTOR),
+            self.upid_addr.get()
+        )
     }
 }
