@@ -1,5 +1,4 @@
 #![no_std]
-#![feature(naked_functions)]
 #![doc = include_str!("../README.md")]
 
 pub mod instructions;

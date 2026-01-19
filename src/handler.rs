@@ -48,7 +48,7 @@ pub struct UintrTrapframe {
 ///
 /// This function is the entry point of UINTR handler, and should not be called
 /// by any user code. Its address can be filled into the IA32_UINTR_HANDLER MSR.
-#[naked]
+#[unsafe(naked)]
 #[allow(dead_code)]
 pub unsafe extern "C" fn uintr_handler_asm_entry() {
     unsafe {
@@ -140,7 +140,7 @@ pub extern "C" fn uintr_handler_rust_entry(utf: &mut UintrTrapframe) {
 
 #[allow(dead_code)]
 pub fn handler_entry_addr() -> usize {
-    uintr_handler_asm_entry as usize
+    uintr_handler_asm_entry as *const () as usize
 }
 
 #[allow(dead_code)]
